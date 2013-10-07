@@ -12,7 +12,7 @@ import xmltree
 import streams
 
 
-# Create the return type.
+# Create the return types.
 type TNOAAWeather* = tuple[suggestedPickup : string, suggestedPickupPeriod : string, location : string, stationID : string,
                            latitude : string, longitude : string, observationTime : string, observationTimeRFC822 : string,
                            weather : string, temperatureString : string, tempF : string, tempC : string, relativeHumidity : string,
@@ -21,6 +21,8 @@ type TNOAAWeather* = tuple[suggestedPickup : string, suggestedPickupPeriod : str
                            dewpointF : string, dewpointC : string, heatIndexString : string, heatIndexF : string, heatIndexC : string,
                            windchillString : string, windchillF : string, windchillC : string, visibilityMi : string,
                            iconUrlBase : string, iconUrlName : string, twoDayHistoryUrl : string, obUrl : string]
+
+type TNOAAStormInfo* = tuple[link : string, title : string, description : string, pubDate : string, guid : string]
 
 
 proc getWeather*(stationID : string): TNOAAWeather = 
@@ -73,3 +75,51 @@ proc getWeather*(stationID : string): TNOAAWeather =
     
     # Return the weather data.
     return weather
+
+
+
+
+# WRITE THE FOLLOWING FUNCTIONS, USE THIS: http://www.spc.noaa.gov/aboutrss.html
+
+
+proc parseRSS(xml : PXmlNode): TNOAAStormInfo = 
+    # Parses the RSS data items into the weather type.
+    
+    # Create the return object.
+    var item : TNOAAStormInfo
+    item.link = xml.child("link").innerText
+    item.title = xml.child("title").innerText
+    item.description = xml.child("description").innerText
+    item.pubDate = xml.child("pubDate").innerText
+    item.guid = xml.child("guid").innerText
+    
+    # Return the info.
+    return item
+
+
+proc getAllWatches*(): seq[TNOAAStormInfo] = 
+    # Gets all the watch info.
+
+
+proc getTornados*(): seq[TNOAAStormInfo] = 
+    # Gets tornado and severe thunderstorm info.
+
+
+proc getPDS*(): seq[TNOAAStormInfo] = 
+    # Gets PDS (Particularly Dangerous Situation) info.
+
+
+proc getMesoscale*(): seq[TNOAAStormInfo] = 
+    # Gets mesoscale discussions.
+
+
+proc getConvective*(): seq[TNOAAStormInfo] = 
+    # Gets convective outlooks.
+
+
+proc getMultimedia*(): seq[TNOAAStormInfo] = 
+    # Gets multimedia briefings.
+
+
+proc getFires*(): seq[TNOAAStormInfo] = 
+    # Gets fire info.

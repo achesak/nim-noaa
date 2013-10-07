@@ -1,0 +1,57 @@
+#### ABOUT ####
+
+nimrod-noaa is a Nimrod wrapper for the NOAA weather API.
+
+----
+
+#### DOCUMENTATION ####
+
+getWeather(stationID : string): TNOAAWeather
+* Gets the weather data. stationID is the NOAA station ID, and is required. Returns a TNOAAWeather object.
+
+TNOAAWeather
+* fields:
+  suggestedPickup
+  suggestedPickupPeriod
+  location
+  stationID
+  latitude
+  longitude
+  observationTime
+  observationTimeRFC822
+  weather
+  temperatureString
+  tempF
+  tempC
+  relativeHumidity
+  windString
+  windDir
+  windDegrees
+  windMph
+  windKt
+  pressureString
+  pressureMb
+  pressureIn
+  dewpointString
+  dewpointF
+  dewpointC
+  heatIndexString
+  heatIndexF
+  heatIndexC
+  windchillString
+  windchillF
+  windchillC
+  visibilityMi
+  iconUrlBase
+  iconUrlName
+  twoDayHistoryUrl
+  obUrl
+(all fields are strings)
+
+See the NOAA API documentation at http://graphical.weather.gov/xml/ for more information.
+
+----
+
+#### LICENSE ####
+
+nimrod-pastebin is released under the MIT Open Source License. See the LICENSE file for more information.
