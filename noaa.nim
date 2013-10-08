@@ -77,49 +77,72 @@ proc getWeather*(stationID : string): TNOAAWeather =
     return weather
 
 
-
-
-# WRITE THE FOLLOWING FUNCTIONS, USE THIS: http://www.spc.noaa.gov/aboutrss.html
-
-
-proc parseRSS(xml : PXmlNode): TNOAAStormInfo = 
+proc parseRSS(url : string): seq[TNOAAStormInfo] = 
     # Parses the RSS data items into the weather type.
     
-    # Create the return object.
-    var item : TNOAAStormInfo
-    item.link = xml.child("link").innerText
-    item.title = xml.child("title").innerText
-    item.description = xml.child("description").innerText
-    item.pubDate = xml.child("pubDate").innerText
-    item.guid = xml.child("guid").innerText
+    # Get the data.
+    var response : string = getContent(url)
     
-    # Return the info.
-    return item
+    # Parse the XML.
+    var xml : PXmlNode = parseXML(newStringStream(response)).child("channel")
+    var items : seq[PXmlNode] = xml.findAll("item")
+    
+    # Create the sequence.
+    var watches = newSeq[TNOAAStormInfo](len(items))
+    
+    # Add the data to the sequence.
+    for i in 0..high(items):
+        
+        # Create the return object.
+        var item : TNOAAStormInfo
+        item.link = items[i].child("link").innerText
+        item.title = items[i].child("title").innerText
+        item.description = items[i].child("description").innerText
+        item.pubDate = items[i].child("pubDate").innerText
+        item.guid = items[i].child("guid").innerText
+        watches[i] = item
+    
+    # Return the sequence.
+    return watches
 
 
 proc getAllWatches*(): seq[TNOAAStormInfo] = 
     # Gets all the watch info.
+    
+    return parseRSS("http://www.spc.noaa.gov/products/spcrss.xml")
 
 
 proc getTornados*(): seq[TNOAAStormInfo] = 
     # Gets tornado and severe thunderstorm info.
+    
+    return parseRSS("http://www.spc.noaa.gov/products/spcwwrss.xml")
 
 
 proc getPDS*(): seq[TNOAAStormInfo] = 
     # Gets PDS (Particularly Dangerous Situation) info.
+    
+    return parseRSS("http://www.spc.noaa.gov/products/spcpdswwrss.xml")
 
 
 proc getMesoscale*(): seq[TNOAAStormInfo] = 
     # Gets mesoscale discussions.
+    
+    return parseRSS("http://www.spc.noaa.gov/products/spcmdrss.xml")
 
 
 proc getConvective*(): seq[TNOAAStormInfo] = 
     # Gets convective outlooks.
+    
+    return parseRSS("http://www.spc.noaa.gov/products/spcacrss.xml")
 
 
 proc getMultimedia*(): seq[TNOAAStormInfo] = 
     # Gets multimedia briefings.
+    
+    return parseRSS("http://www.spc.noaa.gov/products/spcmbrss.xml")
 
 
 proc getFires*(): seq[TNOAAStormInfo] = 
     # Gets fire info.
+    
+    return parseRSS("http://www.spc.noaa.gov/products/spcfwrss.xml")
