@@ -9,6 +9,27 @@ nimrod-noaa is a Nimrod wrapper for the NOAA weather API.
 getWeather(stationID : string): TNOAAWeather
 * Gets the weather data. stationID is the NOAA station ID, and is required. Returns a TNOAAWeather object.
 
+getAllWatches(): seq[TNOAAStormInfo]
+* Gets all Storm Prediction Center (SPC) watches and outlooks. Returns a sequence of TNOAAStormInfo objects.
+
+getTornados(): seq[TNOAAStormInfo]
+* Gets tornado and severe thunderstorm watches. Returns a sequence of TNOAAStormInfo objects.
+
+getPDS(): seq[TNOAAStormInfo]
+* Gets Particularly Dangerous Situation (PDS) tornado and severe thunderstorm watches. Returns a sequence of TNOAAStormInfo objects.
+
+getMesoscale(): seq[TNOAAStormInfo]
+* Gets mesoscale discussions. Returns a sequence of TNOAAStormInfo objects.
+
+getConvective(): seq[TNOAAStormInfo]
+* Gets convective outlooks. Returns a sequence of TNOAAStormInfo objects.
+
+getMultimedia(): seq[TNOAAStormInfo]
+* Gets multimedia briefings. Returns a sequence of TNOAAStormInfo objects.
+
+getFires(): seq[TNOAAStormInfo]
+* Gets fire weather forcasts. Returns a sequence of TNOAAStormInfo objects.
+
 TNOAAWeather
 * fields:
   suggestedPickup
@@ -46,6 +67,15 @@ TNOAAWeather
   iconUrlName
   twoDayHistoryUrl
   obUrl
+(all fields are strings)
+
+TNOAAStormInfo
+* fields:
+  link
+  title
+  description
+  pubDate
+  guid
 (all fields are strings)
 
 See the NOAA API documentation at http://graphical.weather.gov/xml/ for more information.
