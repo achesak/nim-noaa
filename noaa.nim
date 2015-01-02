@@ -1,11 +1,11 @@
 # NOAA weather API wrapper
 
 # Written by Adam Chesak.
-# Code released under the MIT open source license.
+# Released under the MIT open source license.
+
 
 # Import modules.
 import httpclient
-import cgi
 import strutils
 import xmlparser
 import xmltree
@@ -13,7 +13,7 @@ import streams
 
 
 # Create the return types.
-type TNOAAWeather* = tuple[suggestedPickup : string, suggestedPickupPeriod : string, location : string, stationID : string,
+type NOAAWeather* = tuple[suggestedPickup : string, suggestedPickupPeriod : string, location : string, stationID : string,
                            latitude : string, longitude : string, observationTime : string, observationTimeRFC822 : string,
                            weather : string, temperatureString : string, tempF : string, tempC : string, relativeHumidity : string,
                            windString : string, windDir : string, windDegrees : string, windMph : string, windKt : string,
@@ -22,11 +22,13 @@ type TNOAAWeather* = tuple[suggestedPickup : string, suggestedPickupPeriod : str
                            windchillString : string, windchillF : string, windchillC : string, visibilityMi : string,
                            iconUrlBase : string, iconUrlName : string, twoDayHistoryUrl : string, obUrl : string]
 
-type TNOAAStormInfo* = tuple[link : string, title : string, description : string, pubDate : string, guid : string]
+type NOAAStormInfo* = tuple[link : string, title : string, description : string, pubDate : string, guid : string]
 
 
-proc getWeather*(stationID : string): TNOAAWeather = 
-    # Gets the weather data.
+proc getWeather*(stationID : string): NOAAWeather = 
+    ## Gets the weather data.
+    ##
+    ## ``stationID`` is the NOAA station ID, and is required. Returns a ``NOAAWeather`` object.
     
     # Build the URL.
     var params : string = "http://www.weather.gov/xml/current_obs/" & stationID & ".xml"
@@ -34,15 +36,11 @@ proc getWeather*(stationID : string): TNOAAWeather =
     # Get the data.
     var response : string = getContent(params)
     
-    # Remove the second line. Needed because of a problem with the xmlparser. Has been fixed,
-    # but this line is left in for backwards compatability.
-    response = response.replace("<?xml-stylesheet href=\"latest_ob.xsl\" type=\"text/xsl\"?>")
-    
     # Parse the data.
-    var xml : PXmlNode = parseXML(newStringStream(response))
+    var xml : XmlNode = parseXML(newStringStream(response))
     
     # Create the return object.
-    var weather : TNOAAWeather
+    var weather : NOAAWeather
     weather.suggestedPickup = xml.child("suggested_pickup").innerText
     weather.suggestedPickupPeriod = xml.child("suggested_pickup_period").innerText
     weather.location = xml.child("location").innerText
@@ -77,24 +75,24 @@ proc getWeather*(stationID : string): TNOAAWeather =
     return weather
 
 
-proc parseRSS(url : string): seq[TNOAAStormInfo] = 
+proc parseRSS(url : string): seq[NOAAStormInfo] = 
     # Parses the RSS data items into the weather type.
     
     # Get the data.
     var response : string = getContent(url)
     
     # Parse the XML.
-    var xml : PXmlNode = parseXML(newStringStream(response)).child("channel")
-    var items : seq[PXmlNode] = xml.findAll("item")
+    var xml : XmlNode = parseXML(newStringStream(response)).child("channel")
+    var items : seq[XmlNode] = xml.findAll("item")
     
     # Create the sequence.
-    var watches = newSeq[TNOAAStormInfo](len(items))
+    var watches = newSeq[NOAAStormInfo](len(items))
     
     # Add the data to the sequence.
     for i in 0..high(items):
         
         # Create the return object.
-        var item : TNOAAStormInfo
+        var item : NOAAStormInfo
         item.link = items[i].child("link").innerText
         item.title = items[i].child("title").innerText
         item.description = items[i].child("description").innerText
@@ -106,43 +104,57 @@ proc parseRSS(url : string): seq[TNOAAStormInfo] =
     return watches
 
 
-proc getAllWatches*(): seq[TNOAAStormInfo] = 
-    # Gets all the watch info.
+proc getAllWatches*(): seq[NOAAStormInfo] = 
+    ## Gets all Storm Prediction Center (SPC) watches and outlooks.
+    ##
+    ## Returns a sequence of ``NOAAStormInfo`` objects.
     
     return parseRSS("http://www.spc.noaa.gov/products/spcrss.xml")
 
 
-proc getTornados*(): seq[TNOAAStormInfo] = 
-    # Gets tornado and severe thunderstorm info.
+proc getTornados*(): seq[NOAAStormInfo] = 
+    ## Gets tornado and severe thunderstorm watches.
+    ##
+    ## Returns a sequence of ``NOAAStormInfo`` objects.
     
     return parseRSS("http://www.spc.noaa.gov/products/spcwwrss.xml")
 
 
-proc getPDS*(): seq[TNOAAStormInfo] = 
-    # Gets PDS (Particularly Dangerous Situation) info.
+proc getPDS*(): seq[NOAAStormInfo] = 
+    ## Gets Particularly Dangerous Situation (PDS) tornado and severe thunderstorm watches.
+    ##
+    ## Returns a sequence of ``NOAAStormInfo`` objects.
     
     return parseRSS("http://www.spc.noaa.gov/products/spcpdswwrss.xml")
 
 
-proc getMesoscale*(): seq[TNOAAStormInfo] = 
-    # Gets mesoscale discussions.
+proc getMesoscale*(): seq[NOAAStormInfo] = 
+    ## Gets mesoscale discussions.
+    ##
+    ## Returns a sequence of ``NOAAStormInfo`` objects.
     
     return parseRSS("http://www.spc.noaa.gov/products/spcmdrss.xml")
 
 
-proc getConvective*(): seq[TNOAAStormInfo] = 
-    # Gets convective outlooks.
+proc getConvective*(): seq[NOAAStormInfo] = 
+    ## Gets convective outlooks.
+    ##
+    ## Returns a sequence of ``NOAAStormInfo`` objects.
     
     return parseRSS("http://www.spc.noaa.gov/products/spcacrss.xml")
 
 
-proc getMultimedia*(): seq[TNOAAStormInfo] = 
-    # Gets multimedia briefings.
+proc getMultimedia*(): seq[NOAAStormInfo] = 
+    ## Gets multimedia briefings.
+    ##
+    ## Returns a sequence of ``NOAAStormInfo`` objects.
     
     return parseRSS("http://www.spc.noaa.gov/products/spcmbrss.xml")
 
 
-proc getFires*(): seq[TNOAAStormInfo] = 
-    # Gets fire info.
+proc getFires*(): seq[NOAAStormInfo] = 
+    ## Gets fire weather forcasts.
+    ##
+    ## Returns a sequence of ``NOAAStormInfo`` objects.
     
     return parseRSS("http://www.spc.noaa.gov/products/spcfwrss.xml")
