@@ -1,9 +1,0 @@
----- About ----
-
-nim-noaa is a Nim wrapper for the NOAA weather API.
-
-See the documentation.html file and the NOAA API documentation at http://graphical.weather.gov/xml/ for usage and more information.
-
----- License ----
-
-nim-noaa is released under the MIT Open Source License.
